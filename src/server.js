@@ -2,6 +2,8 @@ import Fastify from 'fastify';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 
 dotenv.config();
 
@@ -10,6 +12,11 @@ const fastify = Fastify({ logger: true });
 // Open SQLite database (async)
 let db;
 async function initDB() {
+  // Ensure database directory exists
+  const dbDir = path.resolve('./database');
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
   db = await open({
     filename: './database/transcendenceDB.db',
     driver: sqlite3.Database
