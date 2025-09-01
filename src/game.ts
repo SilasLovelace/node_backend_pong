@@ -1,5 +1,5 @@
 
-class Field {
+export class Field {
   width: number;
   height: number;
   constructor() {
@@ -8,7 +8,7 @@ class Field {
   }
 }
 
-class Ball {
+export class Ball {
   x: number;
   y: number;
   radius: number;
@@ -17,13 +17,13 @@ class Ball {
   constructor(field: Field) {
     this.x = field.width / 2;
     this.y = field.height / 2;
-    this.radius = 5;
-    this.speedX = 0;
-    this.speedY = 0;
+    this.radius = 40;
+    this.speedX = 20 * Math.random();
+    this.speedY = 20 * Math.random();
   }
 }
 
-class Paddle {
+export class Paddle {
   cx: number;
   cy: number;
   length: number;
@@ -31,11 +31,11 @@ class Paddle {
   speed: number;
   ySpeed: number;
   constructor(pos: number, field: Field) {
-    this.cx = pos === 1 ? 30 : field.width - 30; // center x
     this.cy = field.height / 2;                 // center y
     this.length = field.height / 5;             // total length
-    this.width = 20;                            // thickness of paddle
-    this.speed = 10;
+    this.width = 80;                            // thickness of paddle
+    this.cx = pos === 1 ? this.width * 2 : field.width - this.width * 2; // center x
+    this.speed = 20;
     this.ySpeed = 0;
   }
 
@@ -68,7 +68,7 @@ function closestPointOnSegment(paddle: Paddle, ball: Ball) {
   };
 }
 
-function collideBallCapsule(paddle: Paddle, ball: Ball) {
+export function collideBallCapsule(paddle: Paddle, ball: Ball) {
   const capsule = paddle.getCapsule();
   const {x1, y1, x2, y2, R} = capsule;
   const {x, y, radius} = ball;
@@ -105,7 +105,7 @@ function collideBallCapsule(paddle: Paddle, ball: Ball) {
   return true;
 }
 
-function collideBallWithWalls(ball: Ball, field: Field) {
+export function collideBallWithWalls(ball: Ball, field: Field) {
   if (ball.x - ball.radius < 0 || ball.x + ball.radius > field.width) {
     ball.x = Math.max(ball.radius, Math.min(ball.x, field.width - ball.radius));
     ball.speedX *= -1;
