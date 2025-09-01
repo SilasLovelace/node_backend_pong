@@ -30,6 +30,9 @@ export class Paddle {
   width: number;
   speed: number;
   ySpeed: number;
+  private _capsule: { x1: number; y1: number; x2: number; y2: number; R: number } | null = null;
+  private _lastCy: number = -1;
+
   constructor(pos: number, field: Field) {
     this.cy = field.height / 2;                 // center y
     this.length = field.height / 5;             // total length
@@ -40,14 +43,22 @@ export class Paddle {
   }
 
   getCapsule() {
+    // Cache capsule if position hasn't changed
+    if (this._capsule && this._lastCy === this.cy) {
+      return this._capsule;
+    }
+    
     const halfLen = this.length / 2 - this.width / 2;
-    return {
+    this._capsule = {
       x1: this.cx,
       y1: this.cy - halfLen,
       x2: this.cx,
       y2: this.cy + halfLen,
       R: this.width / 2
     };
+    this._lastCy = this.cy;
+    
+    return this._capsule;
   }
 }
 
@@ -68,7 +79,12 @@ function closestPointOnSegment(paddle: Paddle, ball: Ball) {
   };
 }
 
-export function collideBallCapsule(paddle: Paddle, ball: Ball) {
+export function collideBallCapsule(paddle: Paddle, ball: Ball): boolean {
+  // Early distance check - if ball is too far, skip expensive calculations
+  const roughDistance = Math.abs(ball.x - paddle.cx) + Math.abs(ball.y - paddle.cy);
+  const maxPossibleDistance = ball.radius + paddle.width + paddle.length;
+  if (roughDistance > maxPossibleDistance) return false;
+
   const capsule = paddle.getCapsule();
   const {x1, y1, x2, y2, R} = capsule;
   const {x, y, radius} = ball;

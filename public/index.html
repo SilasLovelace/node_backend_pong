@@ -54,6 +54,8 @@
         
         let ws;
         let gameState = null;
+        let lastUpdateTime = 0;
+        let interpolationFactor = 0;
         
         function connect() {
             ws = new WebSocket('ws://localhost:3000/game');
@@ -67,11 +69,10 @@
             ws.onmessage = function(event) {
                 try {
                     const message = JSON.parse(event.data);
-                    console.log('Received:', message);
                     
                     if (message.type === 'gameState') {
                         gameState = message.data;
-                        draw();
+                        lastUpdateTime = performance.now();
                     }
                 } catch (err) {
                     console.error('Error parsing message:', err);
@@ -232,8 +233,12 @@
         // Connect to server
         connect();
         
-        // Initial draw
-        draw();
+        // Start render loop for smooth animation
+        function renderLoop() {
+            draw();
+            requestAnimationFrame(renderLoop);
+        }
+        renderLoop();
     </script>
 </body>
 </html>

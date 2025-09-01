@@ -49,8 +49,10 @@ const paddle2 = new Paddle(2, field); // Right paddle
 const clients = new Set<any>();
 
 // Game loop variables
-const FPS = 60;
-const GAME_LOOP_INTERVAL = 1000 / FPS; // ~16.67ms
+const PHYSICS_FPS = 60;  // Physics updates
+const RENDER_FPS = 30;   // Network updates (reduce network load)
+const PHYSICS_INTERVAL = 1000 / PHYSICS_FPS;
+const RENDER_INTERVAL = 1000 / RENDER_FPS;
 
 // Game state update function
 function updateGameState() {
@@ -126,11 +128,14 @@ function broadcastGameState() {
   }
 }
 
-// Start game loop
+// Start game loops
 setInterval(() => {
   updateGameState();
+}, PHYSICS_INTERVAL);
+
+setInterval(() => {
   broadcastGameState();
-}, GAME_LOOP_INTERVAL);
+}, RENDER_INTERVAL);
 
 // Game state (initial state for new connections)
 function getInitialGameState() {
